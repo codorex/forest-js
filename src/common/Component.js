@@ -61,23 +61,48 @@ export default class Component {
 
     listenOn(elementId) {
         let self = {
-            for: {
-                click: (callback) => {
-                    this._bindListener('click', elementId, callback);
-                    return self;
-                },
-                change: (callback) => {
-                    this._bindListener('change', elementId, callback);
-                    return self;
-                },
-                hover: (callback) => {
-                    this._bindListener('mouseover', elementId, callback);
+            for: (event, callback) => {
+                if(event && callback){
+                    this._bindListener(event, elementId, callback);
                     return self;
                 }
-            }
+
+                return {
+                    click: (callback) => {
+                        this._bindListener('click', elementId, callback);
+                        return self;
+                    },
+                    change: (callback) => {
+                        this._bindListener('change', elementId, callback);
+                        return self;
+                    },
+                    hover: (callback) => {
+                        this._bindListener('mouseover', elementId, callback);
+                        return self;
+                    }
+                };
+            },
         };
 
         return self;
+    }
+
+ /**
+     * Creates a new instance of the provided component type, and adds it to the component chain.
+     * @param {Component} componentType - The type of the component to be constructed.
+     * @param {object} props - The parameters, requested by the component constructor function.
+     * @returns {Component}
+     */
+    createChildAs(componentType, props) {
+        if (typeof componentType === 'function') {
+            let instance = new componentType(props);
+
+            instance.onRenderRequested(() => {
+                this.render();
+            });
+
+            return instance;
+        }
     }
 
     /**
@@ -116,23 +141,6 @@ export default class Component {
     _renderRequested() {
         if (typeof this._renderHandler === 'function') {
             this._renderHandler();
-        }
-    }
-
-    /**
-     * Creates a new instance of the provided component type, and adds it to the component chain.
-     * @param {Component} componentType - The type of the component to be constructed.
-     * @param {object} props - The parameters, requested by the component constructor function.
-     */
-    createChildAs(componentType, props) {
-        if (typeof componentType === 'function') {
-            let instance = new componentType(props);
-
-            instance.onRenderRequested(() => {
-                this.render();
-            });
-
-            return instance;
         }
     }
 }

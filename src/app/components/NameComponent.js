@@ -1,14 +1,14 @@
 import Component from '../../common/Component';
 
 export default class NameComponent extends Component{
-    constructor(){
+    constructor({ name }){
         super(null);
 
         this.state = {
-            name: ''
+            name: name || ''
         };
 
-        this.listenOn('txt-name').for.change(e => {
+        this.listenOn('txt-name').for().change(e => {
             let oldValue = this.state.name;
 
             this.setState({

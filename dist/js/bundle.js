@@ -307,20 +307,27 @@ class Component_Component {
 
     listenOn(elementId) {
         let self = {
-            for: {
-                click: (callback) => {
-                    this._bindListener('click', elementId, callback);
-                    return self;
-                },
-                change: (callback) => {
-                    this._bindListener('change', elementId, callback);
-                    return self;
-                },
-                hover: (callback) => {
-                    this._bindListener('mouseover', elementId, callback);
+            for: (event, callback) => {
+                if(event && callback){
+                    this._bindListener(event, elementId, callback);
                     return self;
                 }
-            }
+
+                return {
+                    click: (callback) => {
+                        this._bindListener('click', elementId, callback);
+                        return self;
+                    },
+                    change: (callback) => {
+                        this._bindListener('change', elementId, callback);
+                        return self;
+                    },
+                    hover: (callback) => {
+                        this._bindListener('mouseover', elementId, callback);
+                        return self;
+                    }
+                };
+            },
         };
 
         return self;
@@ -369,6 +376,7 @@ class Component_Component {
      * Creates a new instance of the provided component type, and adds it to the component chain.
      * @param {Component} componentType - The type of the component to be constructed.
      * @param {object} props - The parameters, requested by the component constructor function.
+     * @returns {Component}
      */
     createChildAs(componentType, props) {
         if (typeof componentType === 'function') {
@@ -386,14 +394,14 @@ class Component_Component {
 
 
 class NameComponent_NameComponent extends Component_Component{
-    constructor(){
+    constructor({ name }){
         super(null);
 
         this.state = {
-            name: ''
+            name: name || ''
         };
 
-        this.listenOn('txt-name').for.change(e => {
+        this.listenOn('txt-name').for().change(e => {
             let oldValue = this.state.name;
 
             this.setState({
@@ -426,7 +434,7 @@ class ListComponent_ListComponent extends Component_Component{
         };
         
         this._components = {
-            name: this.createChildAs(NameComponent_NameComponent)
+            name: this.createChildAs(NameComponent_NameComponent, { name: '' })
         };
 
         this._observableValues = observableValues;
@@ -445,9 +453,13 @@ class ListComponent_ListComponent extends Component_Component{
             });
         });
 
+        // a comparison of fluent event binding
         this.listenOn('btn-add-value')
-            .for.click(e => this.handleAddValueClicked(e))
-            .for.hover(e => console.log(e));
+            .for().click(e => this.handleAddValueClicked(e));
+
+        // and explicit event binding
+        this.listenOn('btn-add-value')
+            .for('mouseover', e => console.log(e));
     }
 
     handleAddValueClicked(e){
@@ -460,8 +472,15 @@ class ListComponent_ListComponent extends Component_Component{
     _template(){
         let listItems = ``;
 
-        this.state.values.forEach(function(value){
-            listItems += `<li>${value}</li>`; 
+        this.state.values.forEach(value => {
+            let $nameInput = this.createChildAs(NameComponent_NameComponent, {name: value});
+            $nameInput.on('text-changed', (e) => console.log(e));
+
+            listItems += `
+            <li>
+                ${value}
+                ${$nameInput}
+            </li>`; 
         });
 
         return `
