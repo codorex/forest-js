@@ -10,7 +10,7 @@ export default class ListComponent extends Component{
         };
         
         this._components = {
-            name: this.createChildAs(NameComponent)
+            name: this.createChildAs(NameComponent, { name: '' })
         };
 
         this._observableValues = observableValues;
@@ -29,9 +29,11 @@ export default class ListComponent extends Component{
             });
         });
 
+        // a comparison of fluent event binding
         this.listenOn('btn-add-value')
             .for().click(e => this.handleAddValueClicked(e));
 
+        // and explicit event binding
         this.listenOn('btn-add-value')
             .for('mouseover', e => console.log(e));
     }
@@ -46,8 +48,15 @@ export default class ListComponent extends Component{
     _template(){
         let listItems = ``;
 
-        this.state.values.forEach(function(value){
-            listItems += `<li>${value}</li>`; 
+        this.state.values.forEach(value => {
+            let $nameInput = this.createChildAs(NameComponent, {name: value});
+            $nameInput.on('text-changed', (e) => console.log(e));
+
+            listItems += `
+            <li>
+                ${value}
+                ${$nameInput}
+            </li>`; 
         });
 
         return `

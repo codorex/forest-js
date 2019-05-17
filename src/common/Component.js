@@ -87,6 +87,24 @@ export default class Component {
         return self;
     }
 
+ /**
+     * Creates a new instance of the provided component type, and adds it to the component chain.
+     * @param {Component} componentType - The type of the component to be constructed.
+     * @param {object} props - The parameters, requested by the component constructor function.
+     * @returns {Component}
+     */
+    createChildAs(componentType, props) {
+        if (typeof componentType === 'function') {
+            let instance = new componentType(props);
+
+            instance.onRenderRequested(() => {
+                this.render();
+            });
+
+            return instance;
+        }
+    }
+
     /**
      * Binds an event listener to the element with the provided id in the scope of the component. 
      * If no such element exits in the scope, the listener will not be bound.
@@ -123,23 +141,6 @@ export default class Component {
     _renderRequested() {
         if (typeof this._renderHandler === 'function') {
             this._renderHandler();
-        }
-    }
-
-    /**
-     * Creates a new instance of the provided component type, and adds it to the component chain.
-     * @param {Component} componentType - The type of the component to be constructed.
-     * @param {object} props - The parameters, requested by the component constructor function.
-     */
-    createChildAs(componentType, props) {
-        if (typeof componentType === 'function') {
-            let instance = new componentType(props);
-
-            instance.onRenderRequested(() => {
-                this.render();
-            });
-
-            return instance;
         }
     }
 }
