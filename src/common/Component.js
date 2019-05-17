@@ -61,20 +61,27 @@ export default class Component {
 
     listenOn(elementId) {
         let self = {
-            for: {
-                click: (callback) => {
-                    this._bindListener('click', elementId, callback);
-                    return self;
-                },
-                change: (callback) => {
-                    this._bindListener('change', elementId, callback);
-                    return self;
-                },
-                hover: (callback) => {
-                    this._bindListener('mouseover', elementId, callback);
+            for: (event, callback) => {
+                if(event && callback){
+                    this._bindListener(event, elementId, callback);
                     return self;
                 }
-            }
+
+                return {
+                    click: (callback) => {
+                        this._bindListener('click', elementId, callback);
+                        return self;
+                    },
+                    change: (callback) => {
+                        this._bindListener('change', elementId, callback);
+                        return self;
+                    },
+                    hover: (callback) => {
+                        this._bindListener('mouseover', elementId, callback);
+                        return self;
+                    }
+                };
+            },
         };
 
         return self;

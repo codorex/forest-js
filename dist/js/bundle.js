@@ -307,20 +307,27 @@ class Component_Component {
 
     listenOn(elementId) {
         let self = {
-            for: {
-                click: (callback) => {
-                    this._bindListener('click', elementId, callback);
-                    return self;
-                },
-                change: (callback) => {
-                    this._bindListener('change', elementId, callback);
-                    return self;
-                },
-                hover: (callback) => {
-                    this._bindListener('mouseover', elementId, callback);
+            for: (event, callback) => {
+                if(event && callback){
+                    this._bindListener(event, elementId, callback);
                     return self;
                 }
-            }
+
+                return {
+                    click: (callback) => {
+                        this._bindListener('click', elementId, callback);
+                        return self;
+                    },
+                    change: (callback) => {
+                        this._bindListener('change', elementId, callback);
+                        return self;
+                    },
+                    hover: (callback) => {
+                        this._bindListener('mouseover', elementId, callback);
+                        return self;
+                    }
+                };
+            },
         };
 
         return self;
@@ -393,7 +400,7 @@ class NameComponent_NameComponent extends Component_Component{
             name: ''
         };
 
-        this.listenOn('txt-name').for.change(e => {
+        this.listenOn('txt-name').for().change(e => {
             let oldValue = this.state.name;
 
             this.setState({
@@ -446,8 +453,10 @@ class ListComponent_ListComponent extends Component_Component{
         });
 
         this.listenOn('btn-add-value')
-            .for.click(e => this.handleAddValueClicked(e))
-            .for.hover(e => console.log(e));
+            .for().click(e => this.handleAddValueClicked(e));
+
+        this.listenOn('btn-add-value')
+            .for('mouseover', e => console.log(e));
     }
 
     handleAddValueClicked(e){

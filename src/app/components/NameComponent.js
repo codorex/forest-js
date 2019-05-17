@@ -8,7 +8,7 @@ export default class NameComponent extends Component{
             name: ''
         };
 
-        this.listenOn('txt-name').for.change(e => {
+        this.listenOn('txt-name').for().change(e => {
             let oldValue = this.state.name;
 
             this.setState({

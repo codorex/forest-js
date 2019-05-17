@@ -30,8 +30,10 @@ export default class ListComponent extends Component{
         });
 
         this.listenOn('btn-add-value')
-            .for.click(e => this.handleAddValueClicked(e))
-            .for.hover(e => console.log(e));
+            .for().click(e => this.handleAddValueClicked(e));
+
+        this.listenOn('btn-add-value')
+            .for('mouseover', e => console.log(e));
     }
 
     handleAddValueClicked(e){
